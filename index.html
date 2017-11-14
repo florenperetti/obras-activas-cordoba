@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Obras Activas en Córdoba</title>
+</head>
+<body>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js"></script>
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.js"></script>
+  <script src="slick.js"></script>
+  
+  <div id="cards"><cards :obras="obras"></cards></div>
+  <script>
+  Vue.component('progress-bar', {
+      template: `<div class="vc_progress_bar wpb_content_element  vc_progress-bar-color-orange"><div :class="'vc_general vc_single_bar vc_progress-bar-color-bar_'+color"><small class="vc_label"> <span class="vc_label_units">{{valor}}%</span></small><span class="vc_bar animated striped" :data-percentage-value="valor" :data-value="valor" :style="'width: '+valor+'%;'"></span></div></div>`,
+      props: ['valor', 'color']
+  })
+
+  Vue.component('card', {
+    template: `<a href="#">
+      <div class="card-header" style="background-image: url(http://placeimg.com/400/200/arch);">
+          <img v-if="obra.icono" :src="obra.icono" class="icono" />
+          <div class="card-title"><h3>{{obra.Obra}}</h3></div>
+      </div>
+      <progress-bar :color="'orange'" :valor="obra['% completado'].split('.')[0]"></progress-bar>
+      <div class="fecha" v-if="obra['% completado'] != '100.00'" v-html="fecha()"></div>
+      <div class="card-summary">
+          <p class="green" v-if="obra.Decreto != 'S/D'" v-html="formatearTitulo()"></p>
+          <p><strong>Monto:</strong> <span>$ {{parseFloat(obra["Monto $"]).toLocaleString()}}</span></p>
+          <p><strong>Barrios:</strong> <span>{{obra.Barrios}}</span></p>
+      </div>
+      <div class="card-meta">
+          <strong>Contratista:</strong> {{obra.Organización}}
+      </div>
+    </a>`,
+    methods: {
+      fecha: function () {
+          const inicio = this.formatearFecha(this.obra["Fecha inicio"]);
+          const fin = this.formatearFecha(this.obra["Fecha finalización estimada"]);
+          return `<span>Inicio<br/>${inicio}</span><span>Fin Estimado<br/>${fin}</span>`;
+      },
+      formatearTitulo: function () {
+        return "<strong>Decreto:</strong> <span>" + this.obra.Decreto + "</span><br/><strong><abbr title='Número de expediente'>N° Exp.</abbr>:</strong> " + this.obra.Expediente;
+      },
+      formatearFecha(fecha) {
+          const date = new Date(fecha);
+          return date.toLocaleDateString();
+      }
+    },
+    props: ['obra']
+  })
+
+  Vue.component('cards', {
+    template: '<div class="cards"><div class="card" v-for="obra in obras"><card :obra="obra"></card></div></div>',
+    mounted: () => {  
+      d3.csv("lista-obras-publicas.csv", function(error, datos) {
+        if (error) return console.error(error);
+        app.$children[0].obras = datos;
+      });
+    },
+    data: () => {
+      return {
+        obras: []
+      }
+    }
+  })
+
+  const app = new Vue({
+    el: '#cards'
+  })
+    /*[
+          {
+              "ID obra": 1,
+              Obra: "Reposición de Postes y Columnas de Alumbrado Publico",
+              Decreto: "S/D",
+              Expediente: "S/D",
+              tipo: "Alumbrado",
+              Organización: "Ingenia Gr.Consultor S.A. 30-70856510-1",
+              moneda_monto: "",
+              "Monto $": "7904703.20",
+              "Fecha inicio": "2017-02-22 00:00:00+00:00",
+              "Fecha finalización estimada": "2017-06-01 00:00:00+00:00",
+              Barrios: "Alberdi - Centro",
+              color: "",
+              "% completado": "100.00",
+              ubicacion: "",
+              icono: "https://www.cordoba.gob.ar/wp-content/uploads/2017/10/icono-alumbrado.png"
+          },{
+              "ID obra": 2,
+              Obra: "San Jorge y Aragon. Cordón Cuneta y Carpeta Asfáltica",
+              Decreto: "N° 743/17 - (Not. 28/03/17)",
+              Expediente: "043.244/16",
+              tipo: "Pavimentacion",
+              Organización: "Corbe S.R.L. 30-56223735-2",
+              moneda_monto: "",
+              "Monto $": "28661032.22",
+              "Fecha inicio": "2017-07-31 00:00:00+00:00",
+              "Fecha finalización estimada": "2018-05-27 00:00:00+00:00",
+              Barrios: "Quintas De San Jorge - Residencial Aragon - General Belgrano - San Jorge - Arturo Capdevila",
+              color: "",
+              "% completado": "10.0",
+              ubicacion: "",
+              icono: "https://www.cordoba.gob.ar/wp-content/uploads/2017/10/icono-baden.png"
+          }
+      ]*/
+
+  jQuery(document).ready(function(){
+    jQuery('.cards').slick({
+      infinite: true,
+      speed: 300,
+      slidesToShow: 1,
+      variableWidth: true
+    });
+  });
+  </script>
+
+  <style scoped>
+  .cards {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding: 1.5%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .card {
+    position: relative;
+    margin: 15px;
+    padding-bottom: 30px;
+    background: #fefff9;
+    color: #363636;
+    text-decoration: none;
+    -moz-box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
+    box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    width: 320px;
+  }
+  @media (max-width: 700px) {
+    .card {
+      width: 100%;
+    }
+  }
+  .card .card-summary {
+    padding: 3% 5% 3% 5%;
+    color: unset;
+  }
+  .card .card-summary p {
+      margin-bottom: 5px;
+  }
+  .card .card-summary strong {
+      vertical-align: top;
+      display: inline-block;
+      text-align: right;
+      width: 24%;
+  }
+  .card .card-summary span {
+      vertical-align: top;
+      display: inline-block;
+      width: 74%;
+  }
+  .card .fecha {
+      background-color: #dedede;
+      color: #6d6d6d;
+      font-weight: 800;
+      line-height: 1.33em;
+      text-transform: uppercase;
+      padding: 2%;
+      font-size: 1.1em;
+  }
+  .card .fecha span {
+      width: 50%;
+      display: inline-block;
+      text-align: center;
+  }
+  .card .icono {
+      position: absolute;
+      right: 3px;
+      width: 15%;
+      top: 4px;
+  }
+  .card .card-header {
+    position: relative;
+    height: 175px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(255, 255, 255, 0.15);
+    background-blend-mode: overlay;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px;
+    border-radius: 4px 4px 0 0;
+  }
+  .card .card-header:hover, .card .card-header:focus {
+    background-color: rgba(255, 255, 255, 0);
+  }
+  .card .card-title {
+    background: rgba(0, 166, 101, 0.85);
+    padding: 3.5% 0 2.5% 0;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+  .card .card-title h3 {
+    font-size: 1.2em;
+    color: white;
+    line-height: 1.2;
+    padding: 0 3.5%;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+  .card .card-meta {
+    max-height: 0;
+    overflow: hidden;
+    color: #666;
+    font-size: .78em;
+    text-transform: uppercase;
+    position: absolute;
+    bottom: 5%;
+    padding: 0 5%;
+    -moz-transition-property: max-height;
+    -o-transition-property: max-height;
+    -webkit-transition-property: max-height;
+    transition-property: max-height;
+    -moz-transition-duration: 0.4s;
+    -o-transition-duration: 0.4s;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    -moz-transition-timing-function: ease-in-out;
+    -o-transition-timing-function: ease-in-out;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-timing-function: ease-in-out;
+  }
+  .card:hover, .card:focus {
+    background: white;
+    -moz-box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 20px 0px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 20px 0px;
+    box-shadow: rgba(0, 0, 0, 0.45) 0px 0px 20px 0px;
+  }
+  .card:hover .card-title, .card:focus .card-title {
+    background: rgba(0, 217, 132, 0.85);
+  }
+  .card:hover .card-meta, .card:focus .card-meta {
+    max-height: 1.5em;
+  }
+  .green {
+      color: var(--verde);
+  }
+  img {
+    max-width: 100%;
+  }
+  .card abbr {
+      text-transform: none;
+      border-bottom: none;
+      letter-spacing: unset;
+  }
+
+  .card .vc_progress_bar.wpb_content_element {
+      margin-bottom: 0;
+  }
+  .slick-slider
+  {
+      position: relative;
+
+      display: block;
+      box-sizing: border-box;
+
+      -webkit-user-select: none;
+         -moz-user-select: none;
+          -ms-user-select: none;
+              user-select: none;
+
+      -webkit-touch-callout: none;
+      -khtml-user-select: none;
+      -ms-touch-action: pan-y;
+          touch-action: pan-y;
+      -webkit-tap-highlight-color: transparent;
+  }
+
+  .slick-list
+  {
+      position: relative;
+
+      display: block;
+      overflow: hidden;
+
+      margin: 0;
+      padding: 0;
+  }
+  .slick-list:focus
+  {
+      outline: none;
+  }
+  .slick-list.dragging
+  {
+      cursor: pointer;
+      cursor: hand;
+  }
+
+  .slick-slider .slick-track,
+  .slick-slider .slick-list
+  {
+      -webkit-transform: translate3d(0, 0, 0);
+         -moz-transform: translate3d(0, 0, 0);
+          -ms-transform: translate3d(0, 0, 0);
+           -o-transform: translate3d(0, 0, 0);
+              transform: translate3d(0, 0, 0);
+  }
+
+  .slick-track
+  {
+      position: relative;
+      top: 0;
+      left: 0;
+
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  .slick-track:before,
+  .slick-track:after
+  {
+      display: table;
+
+      content: '';
+  }
+  .slick-track:after
+  {
+      clear: both;
+  }
+  .slick-loading .slick-track
+  {
+      visibility: hidden;
+  }
+
+  .slick-slide
+  {
+      display: none;
+      float: left;
+
+      height: 100%;
+      min-height: 1px;
+  }
+  [dir='rtl'] .slick-slide
+  {
+      float: right;
+  }
+  .slick-slide img
+  {
+      display: block;
+  }
+  .slick-slide.slick-loading img
+  {
+      display: none;
+  }
+  .slick-slide.dragging img
+  {
+      pointer-events: none;
+  }
+  .slick-initialized .slick-slide
+  {
+      display: block;
+  }
+  .slick-loading .slick-slide
+  {
+      visibility: hidden;
+  }
+  .slick-vertical .slick-slide
+  {
+      display: block;
+
+      height: auto;
+
+      border: 1px solid transparent;
+  }
+  .slick-arrow.slick-hidden {
+      display: none;
+  }
+  .slick-prev,
+  .slick-next
+  {
+      font-size: 0;
+      line-height: 0;
+
+      position: absolute;
+      top: 50%;
+
+      display: block;
+
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      -webkit-transform: translate(0, -50%);
+      -ms-transform: translate(0, -50%);
+      transform: translate(0, -50%);
+
+      cursor: pointer;
+
+      color: transparent;
+      border: none;
+      outline: none;
+      background: transparent;
+  }
+  .slick-prev:hover,
+  .slick-prev:focus,
+  .slick-next:hover,
+  .slick-next:focus
+  {
+      color: transparent;
+      outline: none;
+      background: transparent;
+  }
+  .slick-prev:hover:before,
+  .slick-prev:focus:before,
+  .slick-next:hover:before,
+  .slick-next:focus:before
+  {
+      opacity: 1;
+  }
+  .slick-prev.slick-disabled:before,
+  .slick-next.slick-disabled:before
+  {
+      opacity: .25;
+  }
+  .slick-prev:before,
+  .slick-next:before
+  {
+      font-family: 'slick';
+      font-size: 20px;
+      line-height: 1;
+
+      opacity: .75;
+      color: white;
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+  }
+
+  .slick-prev
+  {
+      left: -25px;
+  }
+  [dir='rtl'] .slick-prev
+  {
+      right: -25px;
+      left: auto;
+  }
+  .slick-prev:before
+  {
+      content: '←';
+  }
+  [dir='rtl'] .slick-prev:before
+  {
+      content: '→';
+  }
+
+  .slick-next
+  {
+      right: -25px;
+  }
+  [dir='rtl'] .slick-next
+  {
+      right: auto;
+      left: -25px;
+  }
+  .slick-next:before
+  {
+      content: '→';
+  }
+  [dir='rtl'] .slick-next:before
+  {
+      content: '←';
+  }
+
+  /* Dots */
+  .slick-dotted.slick-slider
+  {
+      margin-bottom: 30px;
+  }
+
+  .slick-dots
+  {
+      position: absolute;
+      bottom: -25px;
+
+      display: block;
+
+      width: 100%;
+      padding: 0;
+      margin: 0;
+
+      list-style: none;
+
+      text-align: center;
+  }
+  .slick-dots li
+  {
+      position: relative;
+
+      display: inline-block;
+
+      width: 20px;
+      height: 20px;
+      margin: 0 5px;
+      padding: 0;
+
+      cursor: pointer;
+  }
+  .slick-dots li button
+  {
+      font-size: 0;
+      line-height: 0;
+
+      display: block;
+
+      width: 20px;
+      height: 20px;
+      padding: 5px;
+
+      cursor: pointer;
+
+      color: transparent;
+      border: 0;
+      outline: none;
+      background: transparent;
+  }
+  .slick-dots li button:hover,
+  .slick-dots li button:focus
+  {
+      outline: none;
+  }
+  .slick-dots li button:hover:before,
+  .slick-dots li button:focus:before
+  {
+      opacity: 1;
+  }
+  .slick-dots li button:before
+  {
+      font-family: 'slick';
+      font-size: 6px;
+      line-height: 20px;
+
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 20px;
+      height: 20px;
+
+      content: '•';
+      text-align: center;
+
+      opacity: .25;
+      color: black;
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+  }
+  .slick-dots li.slick-active button:before
+  {
+      opacity: .75;
+      color: black;
+  }
+  </style>
+</body>
+</html>
