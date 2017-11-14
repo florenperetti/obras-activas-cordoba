@@ -14,7 +14,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.js"></script>
   <script src="slick.js"></script>
   
-  <div id="cards"><cards :obras="obras"></cards></div>
+  <div id="cards"><cards></cards></div>
   <script>
   Vue.component('progress-bar', {
       template: `<div class="vc_progress_bar wpb_content_element  vc_progress-bar-color-orange"><div :class="'vc_general vc_single_bar vc_progress-bar-color-bar_'+color"><small class="vc_label"> <span class="vc_label_units">{{valor}}%</span></small><span class="vc_bar animated striped" :data-percentage-value="valor" :data-value="valor" :style="'width: '+valor+'%;'"></span></div></div>`,
@@ -119,7 +119,7 @@
   });
   </script>
 
-  <style scoped>
+  <style>
   .cards {
     display: -webkit-flex;
     display: flex;
