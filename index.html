@@ -9,8 +9,8 @@
   textarea,
   input {
     -webkit-appearance: none;
-       -moz-appearance: none;
-            appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     background-clip: padding-box;
   }
   a, ins, del, button {
@@ -26,11 +26,11 @@
     display: -ms-flexbox;
     display: flex;
     -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-            justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
     -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
     white-space: nowrap;
     margin: 0 1rem;
     padding: 2rem 0.5rem 1rem;
@@ -71,7 +71,7 @@
     width: 0.5rem;
     font-weight: 400;
     -webkit-transform: scale(0);
-            transform: scale(0);
+    transform: scale(0);
     -webkit-transition: -webkit-transform 150ms ease-in-out;
     transition: -webkit-transform 150ms ease-in-out;
     transition: transform 150ms ease-in-out;
@@ -95,10 +95,10 @@
     width: 23%;
     flex: 1 0 auto;
     -webkit-backface-visibility: hidden;
-             backface-visibility: hidden;
-     -webkit-transform-origin: 10% 50%;
-             transform-origin: 10% 50%;
-     z-index: 1;
+    backface-visibility: hidden;
+    -webkit-transform-origin: 10% 50%;
+    transform-origin: 10% 50%;
+    z-index: 1;
   }
   .card a {
     display: block;
@@ -108,15 +108,15 @@
     color: unset;
   }
   .card .card-summary strong {
-      vertical-align: top;
-      display: inline-block;
-      text-align: right;
-      width: 44%;
+    vertical-align: top;
+    display: inline-block;
+    text-align: right;
+    width: 44%;
   }
   .card .card-summary span {
-      vertical-align: top;
-      display: inline-block;
-      width: 54%;
+    vertical-align: top;
+    display: inline-block;
+    width: 54%;
   }
   .card .card-summary .barrios {
     margin: 2% 0;
@@ -133,25 +133,25 @@
   }
   .card .card-summary .barrios strong,
   .card .card-summary .barrios span {
-      width: unset;
-      text-align: left;
+    width: unset;
+    text-align: left;
   }
   .card .vc_progress_bar .vc_single_bar {
     background: #54635d;
     border-radius: 0;
   }
   .card .fecha {
-      background-color: #ebebeb;
-      color: #6d6d6d;
-      line-height: 1.33em;
-      font-size: 1em;
+    background-color: #ebebeb;
+    color: #6d6d6d;
+    line-height: 1.33em;
+    font-size: 1em;
   }
   .card .fecha span {
-      width: 50%;
-      display: inline-block;
-      text-align: center;
-      padding: 3% 0;
-      position: relative;
+    width: 50%;
+    display: inline-block;
+    text-align: center;
+    padding: 3% 0;
+    position: relative;
   }
   .card .fecha span:nth-child(2) {
     background-color: rgba(0, 166, 101, 0.85);
@@ -170,10 +170,10 @@
     border-width: 26px 0 26px 7px;
   }
   .card .icono {
-      position: absolute;
-      right: 3px;
-      width: 15%;
-      top: 4px;
+    position: absolute;
+    right: 3px;
+    width: 15%;
+    top: 4px;
   }
   .card .card-header {
     position: relative;
@@ -187,6 +187,16 @@
     -moz-border-radius: 4px 4px 0 0;
     -webkit-border-radius: 4px;
     border-radius: 4px 4px 0 0;
+    text-align: right;
+  }
+  .card .tipo {
+    color: #FFFFFF;
+    background-color: #00a665;
+    display: inline-block;
+    font-weight: bold;
+    padding: 0 5px;
+    margin-top: 15px;
+    margin-right: 52px;
   }
   .card .card-header:hover, .card .card-header:focus {
     background-color: rgba(255, 255, 255, 0);
@@ -216,12 +226,12 @@
     max-width: 100%;
   }
   .card abbr {
-      text-transform: none;
-      border-bottom: none;
-      letter-spacing: unset;
+    text-transform: none;
+    border-bottom: none;
+    letter-spacing: unset;
   }
   .card .vc_progress_bar.wpb_content_element {
-      margin-bottom: 0;
+    margin-bottom: 0;
   }
   .sin-resultados {
     height: 200px;
@@ -249,7 +259,7 @@
   }
   .obra-enter {
     -webkit-transform: scale(0.9);
-            transform: scale(0.9);
+    transform: scale(0.9);
   }
 
 @media all and (max-width: 940px) {
@@ -363,31 +373,34 @@
   });
 
   Vue.component('muni-nav-cards', {
-    template: `<nav class="nav"><menu class="nav__controls">
-      <li class="nav__label">
-        <span class="nav__label--anterior" @click="$emit('volverPagina')"><span>&#12296;</span> <span>anterior</span></span>
-        <span class="nav__label--siguiente" @click="$emit('pasarPagina')"><span>siguiente</span> <span>&#12297;</span></span>
-      </li>
-      <li class="nav__label">
-        <select v-model="tipo" name="tipoObra">
-          <option :value="null">Tipo de obra</option>
-          <option v-for="tipo in tipos" key="tipo.id" :value="tipo.id">{{tipo.nombre}}</option>
-        </select>
-      </li>
-      <li class="nav__label">
-        <select v-model="progreso" name="progreso">
-          <option :value="null">Progreso</option>
-          <option value="licitadas">Licitadas</option>
-          <option value="en_progreso">En progreso</option>
-          <option value="finalizadas">Finalizadas</option>
-        </select>
-      </li>
-      <li class="nav__label">
-        <select v-model="barrio" name="barrio">
-          <option :value="null">Barrio</option>
-          <option v-for="barrio in barrios" key="barrio.id" :value="barrio.id">{{barrio.nombre}}</option>
-        </select>
-      </li>
+    template: `<nav class="nav">
+    <menu>
+      <ul class="nav__controls">
+        <li class="nav__label">
+          <span class="nav__label--anterior" @click="$emit('volverPagina')"><span>&#12296;</span> <span>anterior</span></span>
+          <span class="nav__label--siguiente" @click="$emit('pasarPagina')"><span>siguiente</span> <span>&#12297;</span></span>
+        </li>
+        <li class="nav__label">
+          <select v-model="tipo" name="tipoObra">
+            <option :value="null">Tipo de obra</option>
+            <option v-for="tipo in tipos" key="tipo.id" :value="tipo.id">{{tipo.nombre}}</option>
+          </select>
+        </li>
+        <li class="nav__label">
+          <select v-model="progreso" name="progreso">
+            <option :value="null">Todas</option>
+            <option value="licitadas">Licitadas</option>
+            <option value="en_progreso">En progreso</option>
+            <option value="finalizadas">Finalizadas</option>
+          </select>
+        </li>
+        <li class="nav__label">
+          <select v-model="barrio" name="barrio">
+            <option :value="null">Barrio</option>
+            <option v-for="barrio in barrios" key="barrio.id" :value="barrio.id">{{barrio.nombre}}</option>
+          </select>
+        </li>
+      </ul>
       </menu></nav>`,
       props: ['tipos', 'barrios'],
       data () {
@@ -412,7 +425,8 @@
 
   Vue.component('muni-card', {
     template: `<a :href='obra.id+"/"+nombreToUrl(obra.nombre)'>
-      <div class="card-header" style="background-image: url(http://placeimg.com/400/200/arch);">
+      <div class="card-header" :style="getImagen()">
+          <span class="tipo">{{obra.tipo}}</span>
           <muni-icono :alt="obra.tipo" :id="obra.tipo_id"></muni-icono>
       </div>
       <div class="card-title"><h3>{{obra.nombre}}</h3></div>
@@ -428,6 +442,20 @@
           const fin = this.formatearFecha(this.obra.fecha_finalizacion_estimada);
           return `<span>Inicio<br/>${inicio}</span><span>Fin Estimado<br/>${fin}</span>`;
       },
+      getImagen() {
+        let imagen = 'http://placeimg.com/400/200/arch';
+        for(let i = 0; i < this.obra.trazados.length; i++) {
+          const trazado = this.obra.trazados[i];
+          for(let j = 0; j < trazado.adjuntos.length; j++) {
+            const adjunto = trazado.adjuntos[j];
+            if (adjunto.publicado != false && adjunto.foto && adjunto.foto.thumbnail_500 !== undefined) {
+              imagen = adjunto.foto.thumbnail_500;
+              break;
+            }
+          }
+        }
+        return { backgroundImage: 'url(' + imagen +')' };
+      },
       formatearTitulo() {
         if (this.obra.decreto == 00) {
           return "<strong>Decreto:</strong> <span>Sin información</span>";
@@ -439,10 +467,7 @@
           return date.toLocaleDateString();
       },
       nombreToUrl(nombre) {
-        let resultado = nombre.split('-')[0].split('(')[0].trim().split(' ').join('-');
-        resultado = resultado.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-        resultado = encodeURIComponent(resultado).toLowerCase();
-        return resultado;
+        return nombre.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/\-+/g, '-');
       }
     },
     props: ['obra']
@@ -534,7 +559,7 @@
         this.paginaActual = 1;
         this.sinResultados = false;
         const vm = this;
-        const url = 'https://gobiernoabierto.cordoba.gob.ar/api/v2/obras-publicas/obras-publicas/?page_size=400'+filtroProgreso+filtroTipo+filtroBarrio;
+        const url = 'https://gobiernoabierto.cordoba.gob.ar/api/v2/obras-publicas/obras-publicas/?page_size=20'+filtroProgreso+filtroTipo+filtroBarrio;
         fetch(url)
         .then(data => data.json())
         .then(function(jsonData) {
