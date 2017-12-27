@@ -448,7 +448,7 @@
           const trazado = this.obra.trazados[i];
           for(let j = 0; j < trazado.adjuntos.length; j++) {
             const adjunto = trazado.adjuntos[j];
-            if (adjunto.publicado != false && adjunto.foto && adjunto.foto.thumbnail_500 !== undefined) {
+            if (adjunto.publicado_gobierno != false && adjunto.foto && adjunto.foto.thumbnail_500 !== undefined) {
               imagen = adjunto.foto.thumbnail_500;
               break;
             }
