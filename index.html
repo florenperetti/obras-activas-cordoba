@@ -42,6 +42,10 @@
     display: flex;
     flex-wrap: wrap;
   }
+  .nav__controls > .nav__label {
+    flex: auto;
+    margin-bottom:10px;
+  }
   .nav__label {
     position: relative;
     margin-left: 1rem;
@@ -50,9 +54,25 @@
     cursor: pointer;
     text-align: center;
   }
+  .nav__paginacion {
+    display: flex;
+  }
+  .nav__paginacion > span {
+    flex: auto;
+    align-items: center;
+  }
+  .nav__paginacion .nav__label {
+    padding: 5px;
+    text-align: center;
+    margin-left: 5px;
+    min-width: 25px;
+  }
+  .paginacion__botones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
   .nav__label span {
-    display: inline-block;
-    vertical-align: middle;
     line-height: 38px;
     font-family: Raleway;
     font-size: 14px;
@@ -61,21 +81,16 @@
     font-family: Raleway;
     font-size: 14px !important;
   }
+  .nav__label--active {
+    background-color: #DDDDDD;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .nav__label--active:hover {
+    cursor: default;
+  }
   .nav__label--siguiente {
     margin-left: 1rem;
-  }
-  .nav__label::after {
-    content: '\00d7';
-    display: inline-block;
-    color: transparent;
-    width: 0.5rem;
-    font-weight: 400;
-    -webkit-transform: scale(0);
-    transform: scale(0);
-    -webkit-transition: -webkit-transform 150ms ease-in-out;
-    transition: -webkit-transform 150ms ease-in-out;
-    transition: transform 150ms ease-in-out;
-    transition: transform 150ms ease-in-out, -webkit-transform 150ms ease-in-out;
   }
 
   /*cards*/
@@ -190,13 +205,23 @@
     text-align: right;
   }
   .card .tipo {
-    color: #FFFFFF;
+    color: #fff;
     background-color: #00a665;
     display: inline-block;
     font-weight: bold;
+    max-width: 102px;
+    text-align: center;
     padding: 0 5px;
     margin-top: 15px;
-    margin-right: 52px;
+    margin-right: 45px;
+  }
+  .card .tipo--licitada {
+    margin: 0 0px 0;
+    top: 15px;
+    left: 8px;
+    position: absolute;
+    max-width: unset;
+    background-color: #faa732;
   }
   .card .card-header:hover, .card .card-header:focus {
     background-color: rgba(255, 255, 255, 0);
@@ -279,8 +304,10 @@
   .nav__label,.nav__label--siguiente {
     margin: 0;
   }
-  .nav__label--anterior, .nav__label--siguiente {
-    width: 50%;
+}
+@media all and (max-width: 520px) {
+  .nav__paginacion {
+    flex-direction: column;
   }
 }
 @media all and (max-width: 480px) {
@@ -377,10 +404,6 @@
     <menu>
       <ul class="nav__controls">
         <li class="nav__label">
-          <span class="nav__label--anterior" @click="$emit('volverPagina')"><span>&#12296;</span> <span>anterior</span></span>
-          <span class="nav__label--siguiente" @click="$emit('pasarPagina')"><span>siguiente</span> <span>&#12297;</span></span>
-        </li>
-        <li class="nav__label">
           <select v-model="tipo" name="tipoObra">
             <option :value="null">Tipo de obra</option>
             <option v-for="tipo in tipos" key="tipo.id" :value="tipo.id">{{tipo.nombre}}</option>
@@ -400,14 +423,26 @@
             <option v-for="barrio in barrios" key="barrio.id" :value="barrio.id">{{barrio.nombre}}</option>
           </select>
         </li>
+        <li class="nav__label nav__paginacion" v-show="paginas > 1">
+          <span class="nav__label--anterior" @click="$emit('volverPagina')"><span>&#12296;</span> <span>anterior</span></span>
+          <span class="paginacion__botones">
+            <span :class="claseActiva(i)" @click="$emit('iraPagina', i)" v-for="i in paginas">{{i}}</span>
+          </span>
+          <span class="nav__label--siguiente" @click="$emit('pasarPagina')"><span>siguiente</span> <span>&#12297;</span></span>
+        </li>
       </ul>
       </menu></nav>`,
-      props: ['tipos', 'barrios'],
+      props: ['tipos', 'barrios', 'paginas', 'actual'],
       data () {
         return {
           tipo: null,
           progreso: null,
           barrio: null
+        }
+      },
+      methods: {
+        claseActiva(pagina) {
+          return this.actual == pagina ? 'nav__label nav__label--active' : 'nav__label';
         }
       },
       watch: {
@@ -426,6 +461,7 @@
   Vue.component('muni-card', {
     template: `<a :href='obra.id+"/"+nombreToUrl(obra.nombre)'>
       <div class="card-header" :style="getImagen()">
+          <span v-if="obra.porcentaje_completado == '0.00'" class="tipo tipo--licitada">Licitada</span>
           <span class="tipo">{{obra.tipo}}</span>
           <muni-icono :alt="obra.tipo" :id="obra.tipo_id"></muni-icono>
       </div>
@@ -443,12 +479,12 @@
           return `<span>Inicio<br/>${inicio}</span><span>Fin Estimado<br/>${fin}</span>`;
       },
       getImagen() {
-        let imagen = 'http://placeimg.com/400/200/arch';
+        let imagen = 'https://www.cordoba.gob.ar/wp-content/uploads/2017/12/en-construccion-default.png';
         for(let i = 0; i < this.obra.trazados.length; i++) {
           const trazado = this.obra.trazados[i];
           for(let j = 0; j < trazado.adjuntos.length; j++) {
             const adjunto = trazado.adjuntos[j];
-            if (adjunto.publicado_gobierno != false && adjunto.foto && adjunto.foto.thumbnail_500 !== undefined) {
+            if (adjunto.publicado != false && adjunto.foto && adjunto.foto.thumbnail_500 !== undefined) {
               imagen = adjunto.foto.thumbnail_500;
               break;
             }
@@ -475,7 +511,7 @@
 
   Vue.component('muni-cards', {
     template: `<section>
-      <muni-nav-cards @cambioTipo="cambioTipo" @cambioBarrio="cambioBarrio" @cambioProgreso="cambioProgreso" :barrios="$root.barrios" :tipos="$root.tiposObras" @volverPagina="volverPagina" @pasarPagina="pasarPagina"></muni-nav-cards>
+      <muni-nav-cards :actual="paginaActual" :paginas="ultimaPagina" @cambioTipo="cambioTipo" @cambioBarrio="cambioBarrio" @cambioProgreso="cambioProgreso" :barrios="$root.barrios" :tipos="$root.tiposObras" @iraPagina="iraPagina" @volverPagina="volverPagina" @pasarPagina="pasarPagina"></muni-nav-cards>
       <div class="resultados" v-if="obras.length > 0">
         <div class="paginacion-obras" v-if="mostrandoA > 1">Mostrando {{ indiceDesde+1 }} a {{ mostrandoA }} de {{ todasObras.length }} obras</div>
         <transition-group class="cards" :style="{maxHeight:altoMaximo}" name="obra" tag="div">
@@ -559,7 +595,7 @@
         this.paginaActual = 1;
         this.sinResultados = false;
         const vm = this;
-        const url = 'https://gobiernoabierto.cordoba.gob.ar/api/v2/obras-publicas/obras-publicas/?page_size=20'+filtroProgreso+filtroTipo+filtroBarrio;
+        const url = 'https://gobiernoabierto.cordoba.gob.ar/api/v2/obras-publicas/obras-publicas/?page_size=250'+filtroProgreso+filtroTipo+filtroBarrio;
         fetch(url)
         .then(data => data.json())
         .then(function(jsonData) {
@@ -598,6 +634,12 @@
           this.paginaActual++;
           this.obras = this.todasObras.slice(this.indiceDesde, this.indiceHasta);
         }
+      },
+      iraPagina: function (nroPagina) {
+        this.paginaActual = nroPagina;
+        this.indiceDesde = 0+(this.paginaActual*12)-12;
+        this.indiceHasta = this.indiceDesde+12;
+        this.obras = this.todasObras.slice(this.indiceDesde, this.indiceHasta);
       },
       volverPagina: function() {
         if (this.paginaActual - 1 >= 1) {
