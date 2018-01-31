@@ -412,6 +412,7 @@
         <li class="nav__label">
           <select v-model="progreso" name="progreso">
             <option :value="null">Todas</option>
+            <option value="proyecto">En proyecto</option>
             <option value="licitadas">Licitadas</option>
             <option value="en_progreso">En progreso</option>
             <option value="finalizadas">Finalizadas</option>
@@ -461,17 +462,31 @@
   Vue.component('muni-card', {
     template: `<a :href='obra.id+"/"+nombreToUrl(obra.nombre)'>
       <div class="card-header" :style="getImagen()">
-          <span v-if="obra.porcentaje_completado == '0.00'" class="tipo tipo--licitada">Licitada</span>
+          <span v-if="obra.porcentaje_completado == '0.00'" class="tipo tipo--licitada">{{clasificacion}}</span>
           <span class="tipo">{{obra.tipo}}</span>
           <muni-icono :alt="obra.tipo" :id="obra.tipo_id"></muni-icono>
       </div>
       <div class="card-title"><h3>{{obra.nombre}}</h3></div>
       <progress-bar :color="'orange'" :valor="obra.porcentaje_completado.split('.')[0]"></progress-bar>
-      <div class="fecha" v-if="obra.porcentaje_completado != '100.00'" v-html="fecha()"></div>
+      <div class="fecha" v-if="mostrarFecha" v-html="fecha()"></div>
       <div class="card-summary">
           <p class="barrios" v-if="obra.barrios.length > 0"><strong>Barrios:</strong><br><span v-for="barrio in obra.barrios">{{barrio.nombre}}</span></p>
       </div>
     </a>`,
+    data: function() {
+      return {
+        clasificacion: null,
+        mostrarFecha: true
+      }
+    },
+    mounted: function() {
+      if (this.obra.porcentaje_completado == '0.00') {
+        this.clasificacion = this.obra.organizacion.toLowerCase() === 'sin adjudicar' ? 'Proyecto' : 'Licitada';
+      } else {
+        this.clasificacion = 'Otro';
+      }
+      this.mostrarFecha = this.clasificacion != 'Proyecto' && this.obra.porcentaje_completado != '100.00';
+    },
     methods: {
       fecha() {
           const inicio = this.formatearFecha(this.obra.fecha_inicio);
@@ -581,7 +596,8 @@
       fetchObras: function(opciones = {progresoSeleccionado:null, tipoSeleccionado:null, barrioSeleccionado:null}) {
         const filtroTipo = opciones.tipoSeleccionado ? '&tipo_id='+opciones.tipoSeleccionado : '';
         const filtroBarrio = opciones.barrioSeleccionado ? '&barrios_ids='+opciones.barrioSeleccionado : '';
-        opcionesProgreso = {
+        const opcionesProgreso = {
+          proyecto: '&avance_hasta=0',
           licitadas: '&avance_hasta=0',
           en_progreso: '&avance_desde=1&avance_hasta=99',
           finalizadas: '&avance_desde=100'
@@ -602,8 +618,14 @@
           map.data.forEach(feature => {
             map.data.remove(feature);
           });
-          map.data.addGeoJson(jsonData.results)
-          obras = jsonData.results.features.map(dato => Object.assign({id: dato.id}, dato.properties));
+          let resultados = jsonData.results;
+          if (opciones.progresoSeleccionado === 'proyecto') {
+            resultados.features = resultados.features.filter(obra => obra.properties.organizacion.toLowerCase() === 'sin adjudicar');
+          } else if (opciones.progresoSeleccionado === 'licitadas') {
+            resultados.features = resultados.features.filter(obra => obra.properties.organizacion.toLowerCase() !== 'sin adjudicar');
+          }
+          map.data.addGeoJson(resultados)
+          obras = resultados.features.map(dato => Object.assign({id: dato.id}, dato.properties));
           vm.todasObras = obras;
           vm.sinResultados = obras.length > 0 ? false : true;
           vm.ultimaPagina = Math.ceil(obras.length/12.0);
